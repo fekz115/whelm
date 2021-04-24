@@ -1,0 +1,19 @@
+name: whelm
+description: Library that aims to port the elm arhitecture to Flutter.
+version: 0.0.1
+
+publish_to: 'none'
+
+environment:
+  sdk: ">=2.12.3 <3.0.0"
+  flutter: ">=2.0.5"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
