@@ -10,6 +10,7 @@ class StoreWidget<S, A, E> extends StatefulWidget {
     required this.initaialState,
     required this.child,
     required this.reducers,
+    this.initFunction,
     this.middlewares,
   }) : super(key: key);
 
@@ -18,6 +19,7 @@ class StoreWidget<S, A, E> extends StatefulWidget {
 
   final List<Reducer<S, A>> reducers;
   final List<Middleware<S, A, E>>? middlewares;
+  final void Function(S, void Function(A), void Function(E))? initFunction;
 
   @override
   _StoreWidgetState createState() => _StoreWidgetState<S, A, E>();
@@ -46,6 +48,11 @@ class _StoreWidgetState<S, A, E> extends State<StoreWidget<S, A, E>> {
     stateStreamSubscription = stateStreamController.stream
         .listen((stateFromStream) => state = stateFromStream);
     stateStreamController.add(widget.initaialState);
+    widget.initFunction?.call(
+      state,
+      (action) => actionsStreamController.add(action),
+      (event) => eventStreamController.add(event),
+    );
   }
 
   @override
