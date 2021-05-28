@@ -91,8 +91,9 @@ class _StoreWidgetState<S, A, E> extends State<StoreWidget<S, A, E>> {
   }
 
   void _processReducers(A action, S state) {
-    final reducer = widget.reducers
-        .firstWhere((reducer) => typeOfReducerAction<S, A>(reducer, action));
+    final reducer = widget.reducers.firstWhere(
+        (reducer) => typeOfReducerAction<S, A>(reducer, action),
+        orElse: () => (state, _) => state);
     stateStreamController.add(reducer.call(state, action));
   }
 }
@@ -171,7 +172,7 @@ class StoreConnection<S, A, E, LocalState>
 
   @override
   void eventSubscription(BuildContext context, E event) =>
-      eventListener!(context, event);
+      eventListener?.call(context, event);
 
   @override
   LocalState connection(S state) => connect.call(state);
