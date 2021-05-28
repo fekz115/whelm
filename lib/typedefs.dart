@@ -8,7 +8,7 @@ typedef Middleware<S, A, E> = void Function(
 );
 
 bool typeOfReducerAction<S, A>(Reducer<S, A> r, dynamic action) =>
-    A == action.runtimeType;
+    action is A;
 
 bool typeOfMiddlewareAction<S, A, E>(Middleware<S, A, E> m, dynamic action) =>
-    A == action.runtimeType;
+    action is A;
