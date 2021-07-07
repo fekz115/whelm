@@ -9,16 +9,16 @@ class StoreWidget<S, A, E> extends StatefulWidget {
     Key? key,
     required this.initaialState,
     required this.child,
-    required this.reducers,
+    required this.reducer,
     this.initFunction,
-    this.middlewares,
+    this.middleware,
   }) : super(key: key);
 
   final S initaialState;
   final Widget child;
 
-  final List<Reducer<S, A>> reducers;
-  final List<Middleware<S, A, E>>? middlewares;
+  final Reducer<S, A> reducer;
+  final Middleware<S, A, E>? middleware;
   final void Function(S, void Function(A), void Function(E))? initFunction;
 
   @override
@@ -77,24 +77,18 @@ class _StoreWidgetState<S, A, E> extends State<StoreWidget<S, A, E>> {
   }
 
   Future<void> _processMiddleware(A action, S state) async {
-    widget.middlewares
-        ?.where(
-            (middleware) => typeOfMiddlewareAction<S, A, E>(middleware, action))
-        .forEach(
-          (middleware) async => middleware(
-            state,
-            action,
-            (action) => actionsStreamController.add(action),
-            (event) => eventStreamController.add(event),
-          ),
-        );
+    if(widget.middleware != null) {
+      widget.middleware!(
+        state,
+        action,
+        (action) => actionsStreamController.add(action),
+        (event) => eventStreamController.add(event),
+      );
+    }
   }
 
   void _processReducers(A action, S state) {
-    final reducer = widget.reducers.firstWhere(
-        (reducer) => typeOfReducerAction<S, A>(reducer, action),
-        orElse: () => (state, _) => state);
-    stateStreamController.add(reducer.call(state, action));
+    stateStreamController.add(widget.reducer(state, action));
   }
 }
 
