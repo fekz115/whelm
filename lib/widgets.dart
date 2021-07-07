@@ -232,3 +232,65 @@ class StoreSubscription<S, A, E> extends StoreSubscriber<S, A, E> {
   void eventSubscription(BuildContext context, E event) async =>
       eventListener(context, event);
 }
+
+abstract class DispatcherProvider<S, A, E> extends StatefulWidget {
+  DispatcherProvider({
+    Key? key,
+  }) : super(key: key);
+
+  void eventSubscription(BuildContext context, E event);
+  Widget build(BuildContext context, void Function(A) dispatcher);
+
+  @override
+  _DispatcherProviderState createState() => _DispatcherProviderState<S, A, E>();
+}
+
+class _DispatcherProviderState<S, A, E>
+    extends State<DispatcherProvider<S, A, E>> {
+  late StreamSubscription<E> eventStreamSubscription;
+  late void Function(A) actionDispatcher;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final store = Store.of<S, A, E>(context);
+    if (store == null) {
+      throw new Exception();
+    }
+    eventStreamSubscription = store.eventStream
+        .listen((event) async => widget.eventSubscription(context, event));
+    actionDispatcher = store.actionDispatcher;
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.build(context, actionDispatcher);
+
+  @override
+  void dispose() {
+    eventStreamSubscription.cancel();
+    super.dispose();
+  }
+}
+
+class DispatcherConnection<S, A, E> extends DispatcherProvider<S, A, E> {
+  DispatcherConnection({
+    Key? key,
+    this.eventListener,
+    required this.builder,
+  }) : super(key: key);
+
+  final void Function(BuildContext context, E event)? eventListener;
+  final Widget Function(BuildContext context, void Function(A) dispatcher)
+      builder;
+
+  @override
+  Widget build(BuildContext context, void Function(A) dispatcher) =>
+      builder(context, dispatcher);
+
+  @override
+  void eventSubscription(BuildContext context, E event) {
+    if (eventListener != null) {
+      eventListener!(context, event);
+    }
+  }
+}
