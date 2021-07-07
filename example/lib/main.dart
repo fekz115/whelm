@@ -26,16 +26,12 @@ class MyHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return StoreWidget<int, int, String>(
       initaialState: 0,
-      reducers: [
-        (state, action) {
-          return state + action;
-        }
-      ],
-      middlewares: [
-        (state, action, actionDispatcher, eventDispatcher) {
-          eventDispatcher('action: $action');
-        }
-      ],
+      reducer: (state, action) {
+        return state + action;
+      },
+      middleware: (state, action, actionDispatcher, eventDispatcher) {
+        eventDispatcher('action: $action');
+      },
       child: Scaffold(
         appBar: AppBar(
           title: Text(title),
