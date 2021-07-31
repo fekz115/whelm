@@ -7,14 +7,14 @@ import 'package:whelm/typedefs.dart';
 class StoreWidget<S, A, E> extends StatefulWidget {
   StoreWidget({
     Key? key,
-    required this.initaialState,
+    required this.initialState,
     required this.child,
     required this.reducer,
     this.initFunction,
     this.middleware,
   }) : super(key: key);
 
-  final S initaialState;
+  final S initialState;
   final Widget child;
 
   final Reducer<S, A> reducer;
@@ -36,7 +36,7 @@ class _StoreWidgetState<S, A, E> extends State<StoreWidget<S, A, E>> {
   @override
   void initState() {
     super.initState();
-    state = widget.initaialState;
+    state = widget.initialState;
     eventStreamController = StreamController.broadcast();
     actionsStreamController = StreamController();
     stateStreamController = StreamController.broadcast();
@@ -47,7 +47,7 @@ class _StoreWidgetState<S, A, E> extends State<StoreWidget<S, A, E>> {
     });
     stateStreamSubscription = stateStreamController.stream
         .listen((stateFromStream) => state = stateFromStream);
-    stateStreamController.add(widget.initaialState);
+    stateStreamController.add(widget.initialState);
     widget.initFunction?.call(
       state,
       (action) => actionsStreamController.add(action),
